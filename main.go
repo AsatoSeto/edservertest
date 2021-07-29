@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 
 	"github.com/labstack/echo/v4"
@@ -30,7 +31,7 @@ func brokerFunc(broker *Broker, stat chan []byte) {
 }
 
 func main() {
-
+	port := os.Args[1:]
 	broker := NewServer()
 	stat := make(chan []byte)
 
@@ -55,7 +56,7 @@ func main() {
 		return nil
 	})
 	go brokerFunc(broker, stat)
-	e.Start(":8080")
+	e.Start(fmt.Sprintf(":%s", port[0]))
 }
 
 type Template struct {
