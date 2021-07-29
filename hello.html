@@ -1,0 +1,75 @@
+<!-- {{define "hello"}}Hello, {{.}}!{{end}} -->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        {{.Title}}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+
+        <div  style="position: relative; height:40vh; width:40vw">
+            <canvas id="myChart" >
+            </canvas>
+        </div>
+          <script>
+            var d = [4,4,4] ;
+                const data = {
+                labels: [
+                    'Eng',
+                    'Weap',
+                    'Sys'  
+                ],
+               
+                datasets: [{
+                    label: 'My First Dataset',
+                    data: d,
+                    fill: true,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    pointBackgroundColor: 'rgb(255, 99, 132)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(255, 99, 132)'
+                }]
+                };
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    scales: {
+                    r: {
+                        angleLines: {
+                            display: false
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 8
+                    }
+                },
+                    elements: {
+                    line: {
+                        borderWidth: 1
+                    }
+                    }
+                },
+                };
+          
+            var myChart = new Chart(
+                document.getElementById('myChart'),
+                config
+            );
+            var evtSource = new EventSource('http://localhost:8000/eventTest?stream=test');
+            evtSource.onmessage = function(event) {
+                // document.getElementById('output').innerHTML = event.data;
+                let dataEvent = JSON.parse(event.data);
+                d[0] = parseInt(dataEvent.Eng, 10);
+                d[1] = parseInt(dataEvent.Wep, 10);
+                d[2] = parseInt(dataEvent.Sys, 10);
+
+                console.log(event.data);
+                myChart.update();
+            }
+
+          </script>
+    </body>
+</html>
