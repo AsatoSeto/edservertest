@@ -58,7 +58,7 @@
                 document.getElementById('myChart'),
                 config
             );
-            var evtSource = new EventSource('http://localhost:8000/eventTest?stream=test');
+            var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest?stream=test');
             evtSource.onmessage = function(event) {
                 // document.getElementById('output').innerHTML = event.data;
                 let dataEvent = JSON.parse(event.data);
