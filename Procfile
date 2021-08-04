@@ -1,1 +1,1 @@
-web: bin/edServer $PORT
+web: edserver $PORT

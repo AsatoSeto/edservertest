@@ -1,78 +1,10 @@
-package main
+package sse
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"os"
-	"text/template"
-
-	"github.com/labstack/echo/v4"
 )
-
-type Context struct {
-	Title string
-	Name  string
-	Count int
-}
-type Status struct {
-	System int `json:"Sys"`
-	Weapon int `json:"Wep"`
-	Engine int `json:"Eng"`
-}
-
-func brokerFunc(broker *Broker, stat chan []byte) {
-	for {
-		data := <-stat
-		broker.Notifier <- data
-	}
-}
-
-func main() {
-	port := os.Args[1:]
-	broker := NewServer()
-	stat := make(chan []byte)
-
-	e := echo.New()
-	t := &Template{
-		templates: template.Must(template.ParseGlob("*.html")),
-	}
-	e.Renderer = t
-	e.GET("/hello", Hello)
-	e.GET("/eventTest", func(c echo.Context) error {
-		broker.ServeHTTP(c.Response(), c.Request())
-		return nil
-	})
-	e.POST("/status", func(c echo.Context) error {
-		b := make([]byte, 1024)
-		i, _ := c.Request().Body.Read(b)
-		s := Status{}
-		json.Unmarshal(b[:i], &s)
-		log.Println(s)
-		body, _ := json.Marshal(s)
-		stat <- body
-		return nil
-	})
-	go brokerFunc(broker, stat)
-	e.Start(fmt.Sprintf(":%s", port[0]))
-}
-
-type Template struct {
-	templates *template.Template
-}
-
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.Execute(w, Context{})
-}
-
-func Hello(c echo.Context) error {
-	return c.Render(http.StatusOK, "hello", nil)
-}
-
-// Example SSE server in Golang.
-//     $ go run sse.go
 
 type Broker struct {
 

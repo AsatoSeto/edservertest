@@ -1,0 +1,87 @@
+<!-- {{define "hello"}}Hello, {{.}}!{{end}} -->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        {{.Title}}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <div id="main" style="position: relative; width: 300px; display: grid; grid-template-columns: 350px 350px 350px;">
+        </div>
+          <script>
+            var users = new Map();
+            var initChart = function(d, playerID, canvID) {
+                    const data = {
+                    labels: [
+                        'Eng',
+                        'Weap',
+                        'Sys'  
+                    ],
+                
+                    datasets: [{
+                        label: playerID,
+                        data: d,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 0, 255, 0.5)',
+                        borderColor: 'rgb(0, 255, 0)',
+                        pointBackgroundColor: 'rgb(0, 255, 0)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)'
+                    }]
+                    };
+                const config = {
+                    type: 'radar',
+                    data: data,
+                    options: {
+                        scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                        elements: {
+                        line: {
+                            borderWidth: 1
+                        }
+                        }
+                    },
+                    };
+                    
+                var myChart = new Chart(
+                    document.getElementById(canvID),
+                    config
+                );
+                return myChart;
+            };
+            var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest?stream=test');
+            // var evtSource = new EventSource('http://localhost:1488/eventTest');
+
+            evtSource.onmessage = function(event) {
+                let dataEvent = JSON.parse(event.data);
+                for (const x in dataEvent) {
+                    var d = [parseInt(dataEvent[x].Eng, 10), parseInt(dataEvent[x].Wep, 10), parseInt(dataEvent[x].Sys, 10)];
+                    if (users[x]) {
+                        let chart = users[x];
+                        chart.data.datasets[0].data = d;
+                        chart.update();
+                    } else {
+                        var p = document.getElementById('main');
+                        // p.style.flexDirection = 'row';
+                        var newEl = document.createElement('canvas');
+                        newEl.setAttribute('id', dataEvent[x].player);
+                        // newEl.style.flexDirection = 'row';
+                        p.appendChild(newEl);
+                        users[x] = initChart(d, dataEvent[x].player, dataEvent[x].player);
+                    }
+
+                }
+            }
+
+          </script>
+    </body>
+</html>
