@@ -110,6 +110,9 @@
                         newElFuelReserv.innerText = 'Fuel Reservoir: ' + dataEvent[x].fuel_reservoir;
 
                         newElDiv.appendChild(newElStatus);
+                        newElDiv.appendChild(newElFuel);
+                        newElDiv.appendChild(newElFuelReserv);
+
                         let bg = shieldUPColor;
                         if (!dataEvent[x].shields) {
                             bg = shieldDownColor;
