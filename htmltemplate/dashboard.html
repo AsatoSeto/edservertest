@@ -1,5 +1,3 @@
-<!-- {{define "hello"}}Hello, {{.}}!{{end}} -->
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,8 +8,11 @@
         <div id="main" style="position: relative; width: 300px; display: grid; grid-template-columns: 350px 350px 350px;">
         </div>
           <script>
+            const shieldUPColor = 'rgba(0, 0, 255, 0.5)';
+            const shieldDownColor = 'rgba(255, 0, 0, 0.5)';
+
             var users = new Map();
-            var initChart = function(d, playerID, canvID) {
+            var initChart = function(d, playerID, canvID, bg) {
                     const data = {
                     labels: [
                         'Eng',
@@ -23,7 +24,7 @@
                         label: playerID,
                         data: d,
                         fill: true,
-                        backgroundColor: 'rgba(0, 0, 255, 0.5)',
+                        backgroundColor: bg,
                         borderColor: 'rgb(0, 255, 0)',
                         pointBackgroundColor: 'rgb(0, 255, 0)',
                         pointBorderColor: '#fff',
@@ -58,8 +59,8 @@
                 );
                 return myChart;
             };
-            var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest?stream=test');
-            // var evtSource = new EventSource('http://localhost:1488/eventTest');
+            // var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest?stream=test');
+            var evtSource = new EventSource('http://localhost:1488/eventTest');
 
             evtSource.onmessage = function(event) {
                 let dataEvent = JSON.parse(event.data);
@@ -79,15 +80,42 @@
                     if (users.has(x)) {
                         let chart = users.get(x);
                         chart.data.datasets[0].data = d;
+                        if (dataEvent[x].shields) {
+                            chart.data.datasets[0].backgroundColor = shieldUPColor;
+                        } else {
+                            chart.data.datasets[0].backgroundColor = shieldDownColor;
+                        }
                         chart.update();
+                        document.getElementById(x+'_status').innerText = 'Legal Status: ' + dataEvent[x].legal_state;
                     } else {
                         var p = document.getElementById('main');
-                        var newEl = document.createElement('canvas');
-                        newEl.setAttribute('id', dataEvent[x].player);
-                        p.appendChild(newEl);
-                        users.set(x,initChart(d, dataEvent[x].player, dataEvent[x].player));
-                    }
+                        var newElDiv = document.createElement('div');
+                        newElDiv.setAttribute('id', x+'_div');
+                        p.appendChild(newElDiv);
 
+                        var newEl = document.createElement('canvas');
+                        newEl.setAttribute('id', x);
+                        newElDiv.appendChild(newEl);
+
+                        var newElStatus = document.createElement('span');
+                        newElStatus.setAttribute('id', x+'_status');
+                        newElStatus.innerText = 'Legal Status: ' + dataEvent[x].legal_state;
+
+                        var newElFuel = document.createElement('span');
+                        newElFuel.setAttribute('id', x+'_fuel');
+                        newElFuel.innerText = 'Fuel: ' + dataEvent[x].fuel_main;
+
+                        var newElFuelReserv = document.createElement('span');
+                        newElFuelReserv.setAttribute('id', x+'_fuel_res');
+                        newElFuelReserv.innerText = 'Fuel Reservoir: ' + dataEvent[x].fuel_reservoir;
+
+                        newElDiv.appendChild(newElStatus);
+                        let bg = shieldUPColor;
+                        if (!dataEvent[x].shields) {
+                            bg = shieldDownColor;
+                        }
+                        users.set(x,initChart(d, x, dataEvent[x].player, bg));
+                    }
                 }
             }
 

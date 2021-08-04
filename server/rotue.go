@@ -46,7 +46,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func Dashboard(c echo.Context) error {
-	return c.Render(http.StatusOK, "hello", nil)
+	return c.Render(http.StatusOK, "dashboard", nil)
 }
 
 func StatusHandler(ctx echo.Context) error {
@@ -57,6 +57,7 @@ func StatusHandler(ctx echo.Context) error {
 		log.Println("StatusHandler parse response body error:", err)
 		return err
 	}
+	parseFlags(&s)
 	StatusBoard[s.PlayerID] = s
 
 	if err = sendStatus(); err != nil {
@@ -105,4 +106,76 @@ func ParseResponseBody(rc io.ReadCloser, data interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func parseFlags(s *Status) {
+	bytePos := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19, 20, 22, 27, 28, 30}
+	for i := range bytePos {
+		if (s.Flags>>bytePos[i])&1 == 1 {
+			if bytePos[i] == 0 {
+				s.Docked = true
+			}
+			if bytePos[i] == 1 {
+				s.Landed = true
+			}
+			if bytePos[i] == 2 {
+				s.LandGear = true
+			}
+			if bytePos[i] == 3 {
+				s.Shields = true
+			}
+			if bytePos[i] == 4 {
+				s.Supercruise = true
+			}
+			if bytePos[i] == 5 {
+				s.FAOff = true
+			}
+			if bytePos[i] == 6 {
+				s.WeaponOn = true
+			}
+			if bytePos[i] == 7 {
+				s.InWing = true
+			}
+			if bytePos[i] == 8 {
+				s.Lights = true
+			}
+			if bytePos[i] == 9 {
+				s.CargoScope = true
+			}
+			if bytePos[i] == 10 {
+				s.Silents = true
+			}
+			if bytePos[i] == 11 {
+				s.FuelScoope = true
+			}
+			if bytePos[i] == 16 {
+				s.FSDMassLock = true
+			}
+			if bytePos[i] == 17 {
+				s.FSDCharge = true
+			}
+			if bytePos[i] == 18 {
+				s.FSDCooldown = true
+			}
+			if bytePos[i] == 19 {
+				s.LowFuel = true
+			}
+			if bytePos[i] == 20 {
+				s.OverHeating = true
+			}
+			if bytePos[i] == 22 {
+				s.IsInDanger = true
+			}
+			if bytePos[i] == 27 {
+				s.AnalysMode = true
+			}
+			if bytePos[i] == 28 {
+				s.NVisin = true
+			}
+			if bytePos[i] == 30 {
+				s.FSDJump = true
+			}
+		}
+	}
+
 }
