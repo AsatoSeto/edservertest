@@ -97,15 +97,15 @@
                         newEl.setAttribute('id', x);
                         newElDiv.appendChild(newEl);
 
-                        var newElStatus = document.createElement('span');
+                        var newElStatus = document.createElement('p');
                         newElStatus.setAttribute('id', x+'_status');
                         newElStatus.innerText = 'Legal Status: ' + dataEvent[x].legal_state;
 
-                        var newElFuel = document.createElement('span');
+                        var newElFuel = document.createElement('p');
                         newElFuel.setAttribute('id', x+'_fuel');
                         newElFuel.innerText = 'Fuel: ' + dataEvent[x].fuel_main;
 
-                        var newElFuelReserv = document.createElement('span');
+                        var newElFuelReserv = document.createElement('p');
                         newElFuelReserv.setAttribute('id', x+'_fuel_res');
                         newElFuelReserv.innerText = 'Fuel Reservoir: ' + dataEvent[x].fuel_reservoir;
 
