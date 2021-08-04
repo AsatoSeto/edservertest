@@ -87,6 +87,9 @@
                         }
                         chart.update();
                         document.getElementById(x+'_status').innerText = 'Legal Status: ' + dataEvent[x].legal_state;
+                        document.getElementById(x+'_fuel').innerText = 'Fuel: ' + dataEvent[x].fuel_main;
+                        document.getElementById(x+'_fuel_res').innerText = 'Fuel Reservoir: ' + dataEvent[x].fuel_reservoir;
+
                     } else {
                         var p = document.getElementById('main');
                         var newElDiv = document.createElement('div');
