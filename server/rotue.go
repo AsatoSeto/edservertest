@@ -33,6 +33,7 @@ func RouteStart(broker *sse.Broker) *echo.Echo {
 		return nil
 	})
 	e.POST("/status", StatusHandler)
+	e.POST("/shutdown", ShutdownHandler)
 	return e
 }
 
@@ -62,6 +63,23 @@ func StatusHandler(ctx echo.Context) error {
 		log.Println("StatusHandler sendStatus error:", err)
 		return err
 	}
+	return nil
+}
+
+func ShutdownHandler(ctx echo.Context) error {
+	s := Shutdown{}
+	err := ParseResponseBody(ctx.Request().Body, &s)
+	if err != nil {
+		log.Println("ShutdownHandler parse response body error:", err)
+		return err
+	}
+	s.Delete = true
+	body, err := json.Marshal(s)
+	if err != nil {
+		log.Println("ShutdownHandler marshal error:", err)
+		return err
+	}
+	Stat <- body
 	return nil
 }
 

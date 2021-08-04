@@ -11,3 +11,8 @@ type Status struct {
 	Weapon   int    `json:"Wep"`
 	Engine   int    `json:"Eng"`
 }
+
+type Shutdown struct {
+	PlayerID string `json:"player"`
+	Delete   bool   `json:"delete"`
+}
