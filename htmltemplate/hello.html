@@ -58,8 +58,8 @@
                 );
                 return myChart;
             };
-            // var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest?stream=test');
-            var evtSource = new EventSource('http://localhost:1488/eventTest');
+            var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest?stream=test');
+            // var evtSource = new EventSource('http://localhost:1488/eventTest');
 
             evtSource.onmessage = function(event) {
                 let dataEvent = JSON.parse(event.data);
