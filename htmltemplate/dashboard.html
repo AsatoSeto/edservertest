@@ -3,9 +3,11 @@
     <head>
         {{.Title}}
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     </head>
     <body>
         <div id="main" style="position: relative; width: 200px; display: grid; grid-template-columns: 350px 350px 350px;">
+            
         </div>
           <script>
             const shieldUPColor = 'rgba(0, 0, 255, 0.5)';
@@ -42,7 +44,7 @@
                                 display: true
                             },
                             suggestedMin: 0,
-                            suggestedMax: 10
+                            suggestedMax: 8
                         }
                     },
                         elements: {
@@ -59,8 +61,8 @@
                 );
                 return myChart;
             };
-            var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest?stream=test');
-             //var evtSource = new EventSource('http://localhost:1488/eventTest');
+            var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest');
+            // var evtSource = new EventSource('http://localhost:1488/eventTest');
 
             evtSource.onmessage = function(event) {
                 let dataEvent = JSON.parse(event.data);
@@ -71,7 +73,7 @@
                         ch.parentNode.removeChild(ch);
                     }
                     users.get(dataEvent.player).destroy();
-                    console.log(users.has(dataEvent.player),users.delete(dataEvent.player));
+                    console.log(users.has(dataEvent.player), users.delete(dataEvent.player));
                     console.log(users)
                     return
                 }
@@ -86,9 +88,8 @@
                             chart.data.datasets[0].backgroundColor = shieldDownColor;
                         }
                         chart.update();
-                        document.getElementById(x+'_status').innerText = 'Legal Status: ' + dataEvent[x].legal_state;
-                        document.getElementById(x+'_fuel').innerText = 'Fuel: ' + dataEvent[x].fuel_main;
-                        document.getElementById(x+'_fuel_res').innerText = 'Fuel Reservoir: ' + dataEvent[x].fuel_reservoir;
+                        document.getElementById(x+'_status').innerText = ': ' + dataEvent[x].legal_state;
+                        document.getElementById(x+'_fuel').innerText =  ': ' + dataEvent[x].fuel_main;
 
                     } else {
                         var p = document.getElementById('main');
@@ -100,21 +101,21 @@
                         newEl.setAttribute('id', x);
                         newElDiv.appendChild(newEl);
 
-                        var newElStatus = document.createElement('p');
+                        var newElStatus = document.createElement('i');
                         newElStatus.setAttribute('id', x+'_status');
-                        newElStatus.innerText = 'Legal Status: ' + dataEvent[x].legal_state;
+                        newElStatus.setAttribute('class', 'fas fa-balance-scale');
+                        newElStatus.setAttribute('style', 'display: block; padding-bottom: 2px;');
+                        newElStatus.innerText = ': ' + dataEvent[x].legal_state;
 
-                        var newElFuel = document.createElement('p');
+                        var newElFuel = document.createElement('i');
                         newElFuel.setAttribute('id', x+'_fuel');
-                        newElFuel.innerText = 'Fuel: ' + dataEvent[x].fuel_main;
+                        newElFuel.setAttribute('class', 'fas fa-gas-pump');
 
-                        var newElFuelReserv = document.createElement('p');
-                        newElFuelReserv.setAttribute('id', x+'_fuel_res');
-                        newElFuelReserv.innerText = 'Fuel Reservoir: ' + dataEvent[x].fuel_reservoir;
+                        newElFuel.innerText = ': ' + dataEvent[x].fuel_main;
 
+                      
                         newElDiv.appendChild(newElStatus);
                         newElDiv.appendChild(newElFuel);
-                        newElDiv.appendChild(newElFuelReserv);
 
                         let bg = shieldUPColor;
                         if (!dataEvent[x].shields) {
@@ -124,7 +125,6 @@
                     }
                 }
             }
-
           </script>
     </body>
 </html>
