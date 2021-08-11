@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -58,6 +59,7 @@ func StatusHandler(ctx echo.Context) error {
 		return err
 	}
 	parseFlags(&s)
+	s.lastUpdate = time.Now()
 	StatusBoard[s.PlayerID] = s
 
 	if err = sendStatus(); err != nil {
@@ -177,5 +179,24 @@ func parseFlags(s *Status) {
 			}
 		}
 	}
+
+}
+
+func CheckAFK() {
+	s := Shutdown{}
+	// log.Println("CHECK AFK START")
+	for key := range StatusBoard {
+		if StatusBoard[key].lastUpdate.Add(5 * time.Minute).After(time.Now()) {
+			s.PlayerID = key
+			s.Delete = true
+			body, err := json.Marshal(s)
+			if err != nil {
+				log.Println("ShutdownHandler marshal error:", err)
+				return
+			}
+			Stat <- body
+		}
+	}
+	// log.Println("CHECK AFK END")
 
 }

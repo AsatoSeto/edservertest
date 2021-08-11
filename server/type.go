@@ -1,11 +1,14 @@
 package server
 
+import "time"
+
 type Context struct {
 	Title string
 	Name  string
 	Count int
 }
 type Status struct {
+	lastUpdate    time.Time
 	PlaerName     string  `json:"player_name"`
 	PlayerID      string  `json:"player"`
 	LegalState    string  `json:"legal_state"`

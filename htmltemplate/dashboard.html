@@ -7,7 +7,6 @@
     </head>
     <body>
         <div id="main" style="position: relative; width: 200px; display: grid; grid-template-columns: 350px 350px 350px;">
-            
         </div>
           <script>
             const shieldUPColor = 'rgba(0, 0, 255, 0.5)';
@@ -61,8 +60,8 @@
                 );
                 return myChart;
             };
-            var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest');
-            // var evtSource = new EventSource('http://localhost:1488/eventTest');
+            // var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest');
+            var evtSource = new EventSource('http://localhost:1488/eventTest');
 
             evtSource.onmessage = function(event) {
                 let dataEvent = JSON.parse(event.data);
