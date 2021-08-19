@@ -19,11 +19,12 @@ var Stat = make(chan []byte)
 func RouteStart(broker *sse.Broker) *echo.Echo {
 	e := echo.New()
 	t := &Template{
-		templates: template.Must(template.ParseGlob("./htmltemplate/*.html")),
+		templates: template.Must(template.ParseGlob("./template/html/*.html")),
 	}
 	e.Renderer = t
 	// e.GET("/dashboard", Dashboard)
-	e.GET("/dashboard/*", echo.WrapHandler(http.StripPrefix("/dashboard", http.FileServer(http.Dir("./htmltemplate/")))))
+	e.GET("/dashboard", echo.WrapHandler(http.StripPrefix("/dashboard", http.FileServer(http.Dir("./template/html")))))
+	e.Static("/js", "./template/js")
 	e.GET("/eventTest", func(c echo.Context) error {
 		go func() {
 			if err := sendStatus(); err != nil {
