@@ -22,7 +22,8 @@ func RouteStart(broker *sse.Broker) *echo.Echo {
 		templates: template.Must(template.ParseGlob("./htmltemplate/*.html")),
 	}
 	e.Renderer = t
-	e.GET("/dashboard", Dashboard)
+	// e.GET("/dashboard", Dashboard)
+	e.GET("/dashboard/*", echo.WrapHandler(http.StripPrefix("/dashboard", http.FileServer(http.Dir("./htmltemplate/")))))
 	e.GET("/eventTest", func(c echo.Context) error {
 		go func() {
 			if err := sendStatus(); err != nil {
@@ -186,7 +187,8 @@ func CheckAFK() {
 	s := Shutdown{}
 	// log.Println("CHECK AFK START")
 	for key := range StatusBoard {
-		if StatusBoard[key].lastUpdate.Add(5 * time.Minute).After(time.Now()) {
+		if time.Now().After(StatusBoard[key].lastUpdate.Add(1 * time.Second)) {
+			log.Println("DELETE ", StatusBoard[key].lastUpdate, StatusBoard[key].lastUpdate.Add(5*time.Minute).After(time.Now()), StatusBoard[key].lastUpdate.Add(5*time.Minute))
 			s.PlayerID = key
 			s.Delete = true
 			body, err := json.Marshal(s)
@@ -195,6 +197,7 @@ func CheckAFK() {
 				return
 			}
 			Stat <- body
+			delete(StatusBoard, key)
 		}
 	}
 	// log.Println("CHECK AFK END")
