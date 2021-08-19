@@ -188,7 +188,7 @@ func CheckAFK() {
 	s := Shutdown{}
 	// log.Println("CHECK AFK START")
 	for key := range StatusBoard {
-		if time.Now().After(StatusBoard[key].lastUpdate.Add(1 * time.Second)) {
+		if time.Now().After(StatusBoard[key].lastUpdate.Add(5 * time.Minute)) {
 			log.Println("DELETE ", StatusBoard[key].lastUpdate, StatusBoard[key].lastUpdate.Add(5*time.Minute).After(time.Now()), StatusBoard[key].lastUpdate.Add(5*time.Minute))
 			s.PlayerID = key
 			s.Delete = true
