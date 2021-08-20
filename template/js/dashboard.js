@@ -2,6 +2,18 @@
     const shieldUPColor = 'rgba(0, 0, 255, 0.5)';
     const shieldDownColor = 'rgba(255, 0, 0, 0.5)';
 
+    const activated = '100%';
+    const deactivated = '5%';
+
+    const landGearDeployed = '/ics/landing-gear-normal.png';
+   
+    const landedOnPlanet = '/ics/circle-normal.png';
+    const dockedOnStation = '/ics/coriolis-normal.png';
+    const undocked = '/ics/square-active.png';
+
+    const supercruiseEnable = '/ics/hyperspace-normal.png';
+    const fAssistEnable = '/ics/flight-assist-normal.png'
+
     var users = new Map();
     var initChart = function(d, playerID, canvID, bg) {
             const data = {
@@ -10,7 +22,7 @@
                 'Weap',
                 'Sys'  
             ],
-        
+
             datasets: [{
                 label: playerID,
                 data: d,
@@ -50,25 +62,10 @@
         );
         return myChart;
     };
-    // var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest');
-    var evtSource = new EventSource('http://localhost:1488/eventTest');
-
+    var evtSource = new EventSource('https://edservertest.herokuapp.com/eventTest');
+    // var evtSource = new EventSource('http://localhost:1488/eventTest');
 
     var removeChart = function(playerID) {
-        // var p = document.getElementById('main');
-        var ch = document.getElementById(playerID);
-        if (ch.parentNode) {
-            console.log("remove", playerID);
-            ch.parentNode.removeChild(ch);
-        }
-        ch = document.getElementById(playerID+'_status');
-        if (ch.parentNode) {
-            ch.parentNode.removeChild(ch);
-        }
-        ch = document.getElementById(playerID+'_fuel');
-        if (ch.parentNode) {
-            ch.parentNode.removeChild(ch);
-        }
         ch = document.getElementById(playerID+'_div');
         if (ch.parentNode) {
             ch.parentNode.removeChild(ch);
@@ -80,8 +77,8 @@
     }
 
     var addChart = function(dataEvent, x) {
-        console.log("ADD")
         var d = [parseInt(dataEvent[x].Eng, 10), parseInt(dataEvent[x].Wep, 10), parseInt(dataEvent[x].Sys, 10)];
+        console.log(dataEvent[x]);
         var p = document.getElementById('main');
         var newElDiv = document.createElement('div');
         newElDiv.setAttribute('id', x+'_div');
@@ -100,21 +97,69 @@
         var newElFuel = document.createElement('i');
         newElFuel.setAttribute('id', x+'_fuel');
         newElFuel.setAttribute('class', 'fas fa-gas-pump');
-
         newElFuel.innerText = ': ' + dataEvent[x].fuel_main;
+
+        var newLandGear = document.createElement('img');
+        newLandGear.setAttribute('id', x+'_landing_gear');
+        newLandGear.setAttribute('src', landGearDeployed);
+        newLandGear.setAttribute('style', 'width: 37px; height: 35px;');
+        if (dataEvent[x].land_gear) {
+            newLandGear.style.opacity = activated;
+        } else {
+            newLandGear.style.opacity = deactivated;
+        }
+
+        var newDock = document.createElement('img');
+        newDock.setAttribute('id', x+'_docked');
+        if (dataEvent[x].docked) {
+            newDock.src = dockedOnStation;
+        } else if (dataEvent[x].landed) {
+            newDock.src = landedOnPlanet;
+        } else {
+            newDock.src = undocked;
+        }
+        newDock.setAttribute('style', 'width: 37px; height: 35px;');
+       
+
+        var newSuperCruise = document.createElement('img');
+        newSuperCruise.setAttribute('id', x+'_supercruise');
+        newSuperCruise.setAttribute('src', supercruiseEnable);
+        newSuperCruise.setAttribute('style', 'width: 37px; height: 35px;');
+        if (dataEvent[x].supercruise) {
+            newSuperCruise.style.opacity = activated;
+        } else {
+            newSuperCruise.style.opacity = deactivated;
+        }
+
+        var newFA = document.createElement('img');
+        newFA.setAttribute('id', x+'_flight_assist');
+        newFA.setAttribute('src', fAssistEnable);
+        newFA.setAttribute('style', 'width: 37px; height: 35px;');
+        if (!dataEvent[x].flight_assist) {
+            newFA.style.opacity = activated;
+        } else {
+            newFA.style.opacity = deactivated;
+        }
+
+        newElDiv.appendChild(newLandGear);
+        newElDiv.appendChild(newDock);
+        newElDiv.appendChild(newSuperCruise);
+        newElDiv.appendChild(newFA);
 
         newElDiv.appendChild(newElStatus);
         newElDiv.appendChild(newElFuel);
 
         let bg = shieldUPColor;
         if (!dataEvent[x].shields) {
+            console.log("shield down")
             bg = shieldDownColor;
         }
+        console.log(bg)
+
         users.set(x, initChart(d, dataEvent[x].player_name, x, bg));
     }
 
     var updateChart = function(dataEvent, x) {
-        console.log("UPDATE")
 
         var d = [parseInt(dataEvent[x].Eng, 10), parseInt(dataEvent[x].Wep, 10), parseInt(dataEvent[x].Sys, 10)];
         let chart = users.get(x);
@@ -127,6 +172,32 @@
         chart.update();
         document.getElementById(x+'_status').innerText = ': ' + dataEvent[x].legal_state;
         document.getElementById(x+'_fuel').innerText =  ': ' + dataEvent[x].fuel_main;
+
+        if (dataEvent[x].land_gear) {
+            document.getElementById(x+'_landing_gear').style.opacity = activated;
+        } else {
+            document.getElementById(x+'_landing_gear').style.opacity = deactivated;
+        }
+
+        if (dataEvent[x].docked) {
+            document.getElementById(x+'_docked').src = dockedOnStation;
+        } else if (dataEvent[x].landed) {
+            document.getElementById(x+'_docked').src = landedOnPlanet;
+        } else {
+            document.getElementById(x+'_docked').src = undocked;
+        }
+
+        if (dataEvent[x].supercruise) {
+            document.getElementById(x+'_supercruise').style.opacity = activated;
+        } else {
+            document.getElementById(x+'_supercruise').style.opacity = deactivated;
+        }
+
+        if (!dataEvent[x].flight_assist) {
+            document.getElementById(x+'_flight_assist').style.opacity = activated;
+        } else {
+            document.getElementById(x+'_flight_assist').style.opacity = deactivated;
+        }
     }
 
     evtSource.onmessage = function(event) {

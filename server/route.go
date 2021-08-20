@@ -25,6 +25,8 @@ func RouteStart(broker *sse.Broker) *echo.Echo {
 	// e.GET("/dashboard", Dashboard)
 	e.GET("/dashboard", echo.WrapHandler(http.StripPrefix("/dashboard", http.FileServer(http.Dir("./template/html")))))
 	e.Static("/js", "./template/js")
+	e.Static("/ics", "./template/icons")
+
 	e.GET("/eventTest", func(c echo.Context) error {
 		go func() {
 			if err := sendStatus(); err != nil {
